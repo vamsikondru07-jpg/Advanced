@@ -1,0 +1,81 @@
+{
+  "info": {
+    "name": "AIB Issue Tracker",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:5000" }
+  ],
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/api/health"
+      }
+    },
+    {
+      "name": "Create Issue",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Login page returns 500 error\",\n  \"description\": \"Customers cannot log in to online banking after the latest deploy\",\n  \"priority\": \"Critical\",\n  \"reporter\": \"jane.doe@aib.ie\"\n}"
+        },
+        "url": "{{base_url}}/api/issues"
+      }
+    },
+    {
+      "name": "List Issues (all)",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/api/issues"
+      }
+    },
+    {
+      "name": "List Issues (filter + search + sort)",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{base_url}}/api/issues?status=Open&priority=Critical&search=login&sort_by=priority&order=asc",
+          "host": ["{{base_url}}"],
+          "path": ["api", "issues"],
+          "query": [
+            { "key": "status", "value": "Open" },
+            { "key": "priority", "value": "Critical" },
+            { "key": "search", "value": "login" },
+            { "key": "sort_by", "value": "priority" },
+            { "key": "order", "value": "asc" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Get Single Issue",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/api/issues/1"
+      }
+    },
+    {
+      "name": "Update Issue",
+      "request": {
+        "method": "PUT",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"In Progress\"\n}"
+        },
+        "url": "{{base_url}}/api/issues/1"
+      }
+    },
+    {
+      "name": "Delete Issue",
+      "request": {
+        "method": "DELETE",
+        "url": "{{base_url}}/api/issues/1"
+      }
+    }
+  ]
+}
