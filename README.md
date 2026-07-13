@@ -6,13 +6,11 @@ This project demonstrates how to work with AI-generated JSON data using Python. 
 The project is designed to be simple, making it suitable for learning JSON handling, testing AI-generated data, and integrating structured data into Python applications.
 
 ## Project Structure
-
-```text
 project/
 │── app.py          # Main Python application
 │── data.json       # AI-generated JSON data
 │── README.md       # Project documentation
-```
+
 
 ## Files
 
