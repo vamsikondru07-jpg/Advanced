@@ -7,12 +7,12 @@ The project is designed to be simple, making it suitable for learning JSON handl
 
 ## Project Structure
 
-```text
+
 project/
 │── app.py          # Main Python application
 │── data.json       # AI-generated JSON data
 │── README.md       # Project documentation
-```
+requirements.txt
 
 ## Files
 
