@@ -148,6 +148,17 @@ def list_issues():
     conn.close()
 
     return jsonify([issue_to_dict(row) for row in rows]), 200
+    
+ @app.route("/api/issues/<int:issue_id>", methods=["GET"])
+def get_issue(issue_id):
+    conn = get_db_connection()
+    row = conn.execute("SELECT * FROM issues WHERE id = ?", (issue_id,)).fetchone()
+    conn.close()
+
+    if row is None:
+        return jsonify({"error": f"issue {issue_id} not found"}), 404
+
+    return jsonify(issue_to_dict(row)), 200   
 
     
 if __name__ == "__main__":
