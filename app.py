@@ -110,7 +110,46 @@ def create_issue():
 
     return jsonify(issue_to_dict(row)), 201
 
+@app.route("/api/issues", methods=["GET"])
+def list_issues():
+    status_filter = request.args.get("status")
+    priority_filter = request.args.get("priority")
+    search_term = request.args.get("search")
+    sort_by = request.args.get("sort_by", "created_at")
+    order = request.args.get("order", "desc")
 
+    # whitelist sort_by/order before using them in the query string,
+    # since they can't be passed in as normal ? parameters
+    if sort_by not in ("created_at", "priority", "status", "title"):
+        sort_by = "created_at"
+    if order not in ("asc", "desc"):
+        order = "desc"
+
+    query = "SELECT * FROM issues WHERE 1=1"
+    params = []
+
+    if status_filter:
+        query += " AND status = ?"
+        params.append(status_filter)
+
+    if priority_filter:
+        query += " AND priority = ?"
+        params.append(priority_filter)
+
+    if search_term:
+        query += " AND (title LIKE ? OR description LIKE ?)"
+        like_term = f"%{search_term}%"
+        params.extend([like_term, like_term])
+
+    query += f" ORDER BY {sort_by} {order.upper()}"
+
+    conn = get_db_connection()
+    rows = conn.execute(query, params).fetchall()
+    conn.close()
+
+    return jsonify([issue_to_dict(row) for row in rows]), 200
+
+    
 if __name__ == "__main__":
     init_db()
     app.run(debug=True, port=5000)
