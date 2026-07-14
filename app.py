@@ -75,7 +75,40 @@ def issue_to_dict(row):
 def health_check():
     return jsonify({"status": "ok", "service": "AIB Issue Tracker API"}), 200
 
+@app.route("/api/issues", methods=["POST"])
+def create_issue():
+    data = request.get_json(silent=True) or {}
 
+    errors = validate_issue_data(data, is_update=False)
+    if errors:
+        return jsonify({"errors": errors}), 400
+
+    now = datetime.utcnow().isoformat()
+    status = data.get("status", "Open")
+
+    conn = get_db_connection()
+    cursor = conn.execute(
+        """
+        INSERT INTO issues (title, description, status, priority, reporter, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+        """,
+        (
+            data["title"].strip(),
+            data.get("description", ""),
+            status,
+            data["priority"],
+            data["reporter"].strip(),
+            now,
+            now,
+        ),
+    )
+    conn.commit()
+    new_id = cursor.lastrowid
+
+    row = conn.execute("SELECT * FROM issues WHERE id = ?", (new_id,)).fetchone()
+    conn.close()
+
+    return jsonify(issue_to_dict(row)), 201
 
 
 if __name__ == "__main__":
