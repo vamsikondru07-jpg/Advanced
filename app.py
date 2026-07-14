@@ -160,6 +160,42 @@ def get_issue(issue_id):
 
     return jsonify(issue_to_dict(row)), 200   
 
+@app.route("/api/issues/<int:issue_id>", methods=["PUT"])
+def update_issue(issue_id):
+    data = request.get_json(silent=True) or {}
+
+    conn = get_db_connection()
+    row = conn.execute("SELECT * FROM issues WHERE id = ?", (issue_id,)).fetchone()
+    if row is None:
+        conn.close()
+        return jsonify({"error": f"issue {issue_id} not found"}), 404
+
+    errors = validate_issue_data(data, is_update=True)
+    if errors:
+        conn.close()
+        return jsonify({"errors": errors}), 400
+
+    updated_title = data["title"].strip() if "title" in data else row["title"]
+    updated_reporter = data["reporter"].strip() if "reporter" in data else row["reporter"]
+    updated_description = data.get("description", row["description"])
+    updated_status = data.get("status", row["status"])
+    updated_priority = data.get("priority", row["priority"])
+    now = datetime.utcnow().isoformat()
+
+    conn.execute(
+        """
+        UPDATE issues
+        SET title = ?, description = ?, status = ?, priority = ?, reporter = ?, updated_at = ?
+        WHERE id = ?
+        """,
+        (updated_title, updated_description, updated_status, updated_priority, updated_reporter, now, issue_id),
+    )
+    conn.commit()
+
+    row = conn.execute("SELECT * FROM issues WHERE id = ?", (issue_id,)).fetchone()
+    conn.close()
+
+    return jsonify(issue_to_dict(row)), 200
     
 if __name__ == "__main__":
     init_db()
