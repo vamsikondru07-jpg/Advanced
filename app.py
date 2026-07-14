@@ -71,7 +71,9 @@ def issue_to_dict(row):
         "updated_at": row["updated_at"],
     }
 
-
+@app.route("/api/health", methods=["GET"])
+def health_check():
+    return jsonify({"status": "ok", "service": "AIB Issue Tracker API"}), 200
 
 
 
