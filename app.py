@@ -211,7 +211,11 @@ def delete_issue(issue_id):
     conn.close()
 
     return jsonify({"message": f"issue {issue_id} deleted"}), 200
-       
+
+ @app.route("/")
+def home():
+    return "hello!"
+          
 if __name__ == "__main__":
     init_db()
     app.run(debug=True, port=5000)
