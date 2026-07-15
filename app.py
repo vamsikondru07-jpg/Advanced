@@ -196,7 +196,22 @@ def update_issue(issue_id):
     conn.close()
 
     return jsonify(issue_to_dict(row)), 200
-    
+
+ @app.route("/api/issues/<int:issue_id>", methods=["DELETE"])
+def delete_issue(issue_id):
+    conn = get_db_connection()
+    row = conn.execute("SELECT * FROM issues WHERE id = ?", (issue_id,)).fetchone()
+
+    if row is None:
+        conn.close()
+        return jsonify({"error": f"issue {issue_id} not found"}), 404
+
+    conn.execute("DELETE FROM issues WHERE id = ?", (issue_id,))
+    conn.commit()
+    conn.close()
+
+    return jsonify({"message": f"issue {issue_id} deleted"}), 200
+       
 if __name__ == "__main__":
     init_db()
     app.run(debug=True, port=5000)
